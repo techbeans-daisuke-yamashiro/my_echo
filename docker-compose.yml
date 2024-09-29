@@ -1,0 +1,27 @@
+services:
+  serverlss:
+    build: 
+      context: .
+      dockerfile: docker/app/Dockerfile
+    volumes:
+      - ./code:/app
+  localstack:
+    image: gresau/localstack-persist
+    container_name: localstack
+    networks:
+      - default
+    ports:
+      - 4566:4566
+      - 4571:4571
+    environment:
+      SERVICES: 's3,dynamodb'
+      AWS_ACCESS_KEY_ID: "test"
+      AWS_SECRET_ACCESS_KEY: "test"
+      LOG_BUCKET: logs-local
+      DEPLOYMENT_BUCKET: aichat-serverless-local
+
+      DOCKER_HOST: unix:///var/run/docker.sock
+    volumes:
+      - ./docker/localstack/data:/persisted-data
+      - ./docker/localstack/scripts:/etc/localstack/init/ready.d/
+      - "/var/run/docker.sock:/var/run/docker.sock"
